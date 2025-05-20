@@ -5,36 +5,69 @@ require_once '../models/Libro.php';
 $libroModel = new Libro($conn);
 $action = $_GET['action'] ?? 'index';
 
-switch ($action) {
-    case 'create':
+switch ($action) {    case 'create':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $libroModel->crear($_POST['titulo'], $_POST['autor']);
+            $titulo = trim($_POST['titulo'] ?? '');
+            $autor = trim($_POST['autor'] ?? '');
+            
+            $resultado = $libroModel->crear($titulo, $autor);
+            
+            if ($resultado['success']) {
+                $_SESSION['mensaje'] = "Libro creado exitosamente";
+            } else {
+                $_SESSION['errores'] = $resultado['errores'];
+            }
             header("Location: ../views/libros/index.php");
-        } else {
-            include '../views/libros/create.php';
+            exit;
         }
-        break;
-
-    case 'edit':
+        header("Location: ../views/libros/index.php");
+        break;    case 'edit':
+        if (!isset($_GET['id'])) {
+            $_SESSION['errores'] = ['ID no proporcionado'];
+            header("Location: ../views/libros/index.php");
+            exit;
+        }
+        
         $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $libroModel->actualizar($id, $_POST['titulo'], $_POST['autor']);
-            header("Location: ../views/libros/index.php");
-        } else {
-            $libro = $libroModel->obtenerPorId($id);
-            include '../views/libros/edit.php';
+            $titulo = trim($_POST['titulo'] ?? '');
+            $autor = trim($_POST['autor'] ?? '');
+            
+            $resultado = $libroModel->validarLibro($titulo, $autor);
+            if (empty($resultado)) {
+                if ($libroModel->actualizar($id, $titulo, $autor)) {
+                    $_SESSION['mensaje'] = "Libro actualizado exitosamente";
+                    header("Location: ../views/libros/index.php");
+                } else {
+                    $_SESSION['errores'] = ['Error al actualizar el libro'];
+                    header("Location: ../views/libros/edit.php?id=" . $id);
+                }
+            } else {
+                $_SESSION['errores'] = $resultado;
+                header("Location: ../views/libros/edit.php?id=" . $id);
+            }
+            exit;
         }
-        break;
+        header("Location: ../views/libros/edit.php?id=" . $id);
+        exit;
+        break;case 'delete':
+        if (!isset($_GET['id'])) {
+            $_SESSION['errores'] = ['ID no proporcionado'];
+            header("Location: ../views/libros/index.php");
+            exit;
+        }
 
-    case 'delete':
         $id = $_GET['id'];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $libroModel->eliminar($id);
+            if ($libroModel->eliminar($id)) {
+                $_SESSION['mensaje'] = "Libro eliminado exitosamente";
+            } else {
+                $_SESSION['errores'] = ["Error al eliminar el libro"];
+            }
             header("Location: ../views/libros/index.php");
-        } else {
-            $libro = $libroModel->obtenerPorId($id);
-            include '../views/libros/delete.php';
+            exit;
         }
+        header("Location: ../views/libros/index.php");
         break;
 
 

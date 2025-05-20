@@ -22,9 +22,8 @@
     $libros = $libroModel->obtenerTodos();
     ?>    <div class="container">
         <div class="navbar">
-            <h2><i class="fas fa-book"></i> Lista de Libros</h2>
-            <div>
-                <a href="../../controllers/LibroController.php?action=create" class="btn">
+            <h2><i class="fas fa-book"></i> Lista de Libros</h2>            <div>
+                <a href="create.php" class="btn">
                     <i class="fas fa-plus"></i> Agregar nuevo libro
                 </a>
                 <a href="../welcome.php" class="btn">
@@ -32,6 +31,24 @@
                 </a>
             </div>
         </div>
+
+        <?php if (isset($_SESSION['mensaje'])): ?>
+            <div class="alert alert-success">
+                <?= $_SESSION['mensaje'] ?>
+                <?php unset($_SESSION['mensaje']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['errores'])): ?>
+            <div class="alert alert-danger">
+                <?php 
+                foreach ($_SESSION['errores'] as $error) {
+                    echo htmlspecialchars($error) . '<br>';
+                }
+                unset($_SESSION['errores']);
+                ?>
+            </div>
+        <?php endif; ?>
 
         <table>
             <thead>
@@ -44,16 +61,14 @@
             </thead>
             <tbody>
                 <?php foreach ($libros as $libro): ?>
-                    <tr>
-                        <td><?= $libro['id'] ?></td>
+                    <tr>                        <td><?= $libro['id'] ?></td>
                         <td><?= htmlspecialchars($libro['titulo']) ?></td>
                         <td><?= htmlspecialchars($libro['autor']) ?></td>
-                        <td class="actions">                            <a href="../../controllers/LibroController.php?action=edit&id=<?= $libro['id'] ?>" class="btn">
+                        <td class="actions">
+                            <a href="edit.php?id=<?= $libro['id'] ?>" class="btn">
                                 <i class="fas fa-edit"></i> Editar
                             </a>
-                            <a href="../../controllers/LibroController.php?action=delete&id=<?= $libro['id'] ?>" 
-                               onclick="return confirm('¿Está seguro de que desea eliminar este libro?')" 
-                               class="btn btn-danger">
+                            <a href="delete.php?id=<?= $libro['id'] ?>" class="btn btn-danger">
                                 <i class="fas fa-trash-alt"></i> Eliminar
                             </a>
                         </td>

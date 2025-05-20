@@ -10,16 +10,32 @@
 <body>
     <div class="container">
         <div class="card">
-            <h2><i class="fas fa-user-plus"></i> Registro de Usuario</h2>
-            <form method="post" action="../../controllers/AuthController.php?action=register">
+            <h2><i class="fas fa-user-plus"></i> Registro de Usuario</h2>            <form method="post" action="../../controllers/AuthController.php?action=register">                <?php
+                if (isset($_SESSION['errores'])) {
+                    echo '<div class="alert alert-danger">';
+                    foreach ($_SESSION['errores'] as $error) {
+                        echo htmlspecialchars($error) . '<br>';
+                    }
+                    echo '</div>';
+                    unset($_SESSION['errores']);
+                }
+                ?>
                 <div class="form-group">
                     <label for="usuario">Usuario</label>
-                    <input type="text" id="usuario" name="usuario" class="form-control" required>
+                    <input type="text" id="usuario" name="usuario" class="form-control" 
+                           required pattern="[a-zA-Z0-9_-]{4,20}"
+                           title="El usuario debe tener entre 4 y 20 caracteres y solo puede contener letras, números y guiones">
+                </div>
+                <div class="form-group">
+                    <label for="nombre_completo">Nombre Completo</label>
+                    <input type="text" id="nombre_completo" name="nombre_completo" class="form-control" 
+                           required pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,100}"
+                           title="El nombre completo solo puede contener letras y espacios">
                 </div>
                 <div class="form-group">
                     <label for="correo">Correo</label>
-                    <input type="email" id="correo" name="correo" class="form-control" required>
-                </div>
+                    <input type="email" id="correo" name="correo" class="form-control" 
+                           required maxlength="100">
                 <div class="form-group">
                     <label for="contrasena">Contraseña</label>
                     <input type="password" id="contrasena" name="contrasena" class="form-control" required>

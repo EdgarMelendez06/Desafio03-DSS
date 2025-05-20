@@ -16,7 +16,7 @@ if (!isset($_SESSION['usuario'])) {
 </head>
 <body>
     <div class="container welcome-container">
-        <h2><i class="fas fa-user-circle"></i> Bienvenido, <?= htmlspecialchars($_SESSION['usuario']) ?></h2>
+        <h2><i class="fas fa-user-circle"></i> Bienvenido, <?= htmlspecialchars($_SESSION['nombre_completo']) ?></h2>
         <div class="menu-links">
             <a href="libros/index.php" class="btn">
                 <i class="fas fa-book"></i> Gestionar Libros
