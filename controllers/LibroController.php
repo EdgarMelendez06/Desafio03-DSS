@@ -5,7 +5,8 @@ require_once '../models/Libro.php';
 $libroModel = new Libro($conn);
 $action = $_GET['action'] ?? 'index';
 
-switch ($action) {    case 'create':
+switch ($action) {    
+    case 'create':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $titulo = trim($_POST['titulo'] ?? '');
             $autor = trim($_POST['autor'] ?? '');
@@ -21,7 +22,8 @@ switch ($action) {    case 'create':
             exit;
         }
         header("Location: ../views/libros/index.php");
-        break;    case 'edit':
+        break;    
+        case 'edit':
         if (!isset($_GET['id'])) {
             $_SESSION['errores'] = ['ID no proporcionado'];
             header("Location: ../views/libros/index.php");
@@ -50,7 +52,8 @@ switch ($action) {    case 'create':
         }
         header("Location: ../views/libros/edit.php?id=" . $id);
         exit;
-        break;case 'delete':
+        break;
+        case 'delete':
         if (!isset($_GET['id'])) {
             $_SESSION['errores'] = ['ID no proporcionado'];
             header("Location: ../views/libros/index.php");

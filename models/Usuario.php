@@ -28,21 +28,32 @@ class Usuario {
         }
 
         return $errores;
-    }
-
-    public function registrar($usuario, $nombre_completo, $correo, $contrasena) {
+    }    public function registrar($usuario, $nombre_completo, $correo, $contrasena) {
+        error_log("Iniciando registro de usuario: " . $usuario);
+        
         // Validar datos
         $errores = $this->validarUsuario($usuario, $nombre_completo, $correo, $contrasena);
         if (!empty($errores)) {
+            error_log("Errores de validación para usuario " . $usuario . ": " . implode(", ", $errores));
             return ['success' => false, 'errores' => $errores];
         }
 
         try {
             // Verificar si el usuario ya existe
-            $stmt = $this->conn->prepare("SELECT id FROM usuarios WHERE usuario = ? OR correo = ?");
+            $stmt = $this->conn->prepare("SELECT id, usuario, correo FROM usuarios WHERE usuario = ? OR correo = ?");
             $stmt->execute([$usuario, $correo]);
-            if ($stmt->fetch()) {
-                return ['success' => false, 'errores' => ['El usuario o correo ya existe']];
+            $existente = $stmt->fetch();
+            
+            if ($existente) {
+                $errores = [];
+                if ($existente['usuario'] === $usuario) {
+                    $errores[] = "El nombre de usuario ya está en uso";
+                }
+                if ($existente['correo'] === $correo) {
+                    $errores[] = "El correo electrónico ya está registrado";
+                }
+                error_log("Usuario o correo existente: " . implode(", ", $errores));
+                return ['success' => false, 'errores' => $errores];
             }
 
             $hash = password_hash($contrasena, PASSWORD_DEFAULT);
@@ -50,9 +61,11 @@ class Usuario {
             $stmt = $this->conn->prepare($sql);
             $stmt->execute([$usuario, $nombre_completo, $correo, $hash]);
             
+            error_log("Usuario registrado exitosamente: " . $usuario);
             return ['success' => true];
         } catch (PDOException $e) {
-            return ['success' => false, 'errores' => ['Error en la base de datos: ' . $e->getMessage()]];
+            error_log("Error en la base de datos al registrar usuario " . $usuario . ": " . $e->getMessage());
+            return ['success' => false, 'errores' => ['Error al crear el usuario. Por favor, intente nuevamente.']];
         }
     }
 

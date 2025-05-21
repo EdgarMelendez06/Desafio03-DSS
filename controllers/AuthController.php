@@ -12,6 +12,12 @@ if ($action == 'register') {
     $correo = trim($_POST['correo'] ?? '');
     $contrasena = $_POST['contrasena'] ?? '';
 
+    if (empty($usuario) || empty($nombre_completo) || empty($correo) || empty($contrasena)) {
+        $_SESSION['errores'] = ['Todos los campos son obligatorios'];
+        header("Location: ../views/auth/register.php");
+        exit;
+    }
+
     $resultado = $usuarioModel->registrar($usuario, $nombre_completo, $correo, $contrasena);
     
     if ($resultado['success']) {
@@ -21,7 +27,8 @@ if ($action == 'register') {
         $_SESSION['errores'] = $resultado['errores'];
         header("Location: ../views/auth/register.php");
     }
-} elseif ($action == 'login') {
+    exit;
+}elseif ($action == 'login') {
     $usuario = $_POST['usuario'];
     $contrasena = $_POST['contrasena'];
 
